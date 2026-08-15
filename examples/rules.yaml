@@ -1,0 +1,61 @@
+---
+groups:
+  - name: adguard
+    rules:
+      - alert: AdGuardExporterDown
+        expr: up{job="adguard-exporter"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AdGuard exporter is down"
+          description: "Prometheus cannot scrape adguard-exporter. House DNS metrics are blind."
+
+      - alert: AdGuardCollectorFailing
+        expr: adguard_scrape_collector_success == 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AdGuard {{ $labels.server }} is not collecting"
+          description: "The exporter is up but cannot read {{ $labels.server }}. Check credentials and reachability."
+
+      - alert: AdGuardDown
+        expr: adguard_running == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AdGuard {{ $labels.server }} reports itself stopped"
+          description: "DNS resolution for clients using {{ $labels.server }} is failing."
+
+      - alert: AdGuardProtectionDisabled
+        expr: adguard_protection_enabled == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AdGuard {{ $labels.server }} has filtering disabled"
+          description: "Ad and tracker blocking is off on {{ $labels.server }}. This is usually a temporary pause left on by accident."
+
+      - alert: AdGuardSlowProcessing
+        expr: adguard_avg_processing_time_seconds > 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "AdGuard {{ $labels.server }} is resolving slowly"
+          description: "Mean processing time is {{ $value | humanizeDuration }}, against a ~17ms baseline."
+
+      # The _24h and _last_hour metric names are only correct while AdGuard's
+      # statistics window is 24 hours. Above that it switches to daily buckets
+      # and both names become lies. This asserts the observed value rather
+      # than trusting the deployment's intent.
+      - alert: AdGuardStatsWindowUnexpected
+        expr: adguard_stats_window_seconds != 86400
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "AdGuard {{ $labels.server }} statistics window is not 24h"
+          description: "Window is {{ $value }}s. The _24h and _last_hour metric names no longer describe what they carry."

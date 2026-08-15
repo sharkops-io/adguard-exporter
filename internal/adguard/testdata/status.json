@@ -1,0 +1,22 @@
+{
+    "version": "v0.107.78",
+    "language": "",
+    "dns_addresses": [
+        "127.0.0.1",
+        "::1",
+        "192.0.2.10",
+        "fd00:db8::1",
+        "2001:db8::2",
+        "fd00:db8::3",
+        "2001:db8:0:0:aaaa:bbbb:cccc:dddd",
+        "fd00:db8::1234:5678:9abc:def0",
+        "fe80::1111:2222:3333:4444%eth0"
+    ],
+    "dns_port": 53,
+    "http_port": 80,
+    "protection_disabled_duration": 0,
+    "start_time": 1786655323112.1416,
+    "protection_enabled": true,
+    "dhcp_available": true,
+    "running": true
+}

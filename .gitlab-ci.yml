@@ -1,0 +1,47 @@
+include:
+  - project: 'sharkops/gitlab-ci-common-config'
+    ref: master
+    file: 'docker/build.yml'
+
+# The included template's jobs both declare `stage: build` and supply no
+# `stages:` list of their own, so this project must declare one covering every
+# stage any included or local job uses.
+stages: [test, rules, build]
+
+variables:
+  GO_VERSION: "1.26"
+  # docker/build.yml builds with Kaniko, single-arch: whatever platform the
+  # executor runs on (amd64 on this org's shared runners). The target cluster
+  # is amd64-only, so that is an accepted trade.
+  REGISTRY_URL: $CI_REGISTRY
+  REGISTRY_USER: $CI_REGISTRY_USER
+  REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+
+# Pinned, not :latest. golangci-lint refuses to run when the Go version it was
+# built with is older than the one go.mod targets, so :latest turns a routine
+# upstream release into a red pipeline on an unchanged commit. Bump this tag
+# together with GO_VERSION and go.mod's `go` directive.
+lint:
+  stage: test
+  image: golangci/golangci-lint:v2.12.2
+  script:
+    - golangci-lint run --timeout 5m
+
+test:
+  stage: test
+  image: golang:${GO_VERSION}
+  script:
+    - go test ./... -race -count=1
+
+# prom/prometheus's default ENTRYPOINT is the prometheus binary, which rejects
+# `promtool` as an unknown argument — hence the entrypoint override.
+rules:
+  stage: rules
+  image:
+    name: prom/prometheus:latest
+    entrypoint: [""]
+  script:
+    - cd examples
+    - promtool check rules rules.yaml
+    - promtool test rules rules_test.yaml
