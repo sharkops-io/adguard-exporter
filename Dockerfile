@@ -4,7 +4,7 @@
 # cluster is amd64, so without it a `--platform linux/amd64` build silently
 # produces an arm64 binary inside an amd64 image, which fails only at pod
 # start with "exec format error".
-FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS build
 ARG TARGETOS TARGETARCH
 WORKDIR /src
 COPY go.mod go.sum ./
