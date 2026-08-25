@@ -2,14 +2,28 @@ include:
   - project: 'sharkops/gitlab-ci-common-config'
     ref: master
     file: 'docker/build.yml'
+  # lint + test. Extracted 2026-08-24 - this repo and four sibling exporters
+  # carried byte-identical copies, which had already drifted (exporter-common
+  # hardcoded golang:1.26 while the rest used ${GO_VERSION}).
+  - project: 'sharkops/gitlab-ci-common-config'
+    ref: master
+    file: 'go/ci.yml'
+  # promtool validation of examples/rules.yaml. The entrypoint override that
+  # prom/prometheus needs lives in the template now.
+  - project: 'sharkops/gitlab-ci-common-config'
+    ref: master
+    file: 'prometheus/rules.yml'
 
-# The included template's jobs both declare `stage: build` and supply no
-# `stages:` list of their own, so this project must declare one covering every
-# stage any included or local job uses.
+# The included jobs supply no `stages:` list of their own, so this project must
+# declare one covering every stage any included or local job uses.
 stages: [test, rules, build]
 
 variables:
-  GO_VERSION: "1.26"
+  # GO_VERSION and GOLANGCI_LINT_VERSION default in go/ci.yml (1.26 / v2.12.2)
+  # and are only set here when this repo needs to differ. Bump them together
+  # with go.mod's `go` directive - golangci-lint refuses to run when the Go
+  # version it was built with is older than the one go.mod targets.
+  #
   # docker/build.yml builds with Kaniko, single-arch: whatever platform the
   # executor runs on (amd64 on this org's shared runners). The target cluster
   # is amd64-only, so that is an accepted trade.
@@ -17,31 +31,3 @@ variables:
   REGISTRY_USER: $CI_REGISTRY_USER
   REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   IMAGE_NAME: $CI_REGISTRY_IMAGE
-
-# Pinned, not :latest. golangci-lint refuses to run when the Go version it was
-# built with is older than the one go.mod targets, so :latest turns a routine
-# upstream release into a red pipeline on an unchanged commit. Bump this tag
-# together with GO_VERSION and go.mod's `go` directive.
-lint:
-  stage: test
-  image: golangci/golangci-lint:v2.12.2
-  script:
-    - golangci-lint run --timeout 5m
-
-test:
-  stage: test
-  image: golang:${GO_VERSION}
-  script:
-    - go test ./... -race -count=1
-
-# prom/prometheus's default ENTRYPOINT is the prometheus binary, which rejects
-# `promtool` as an unknown argument — hence the entrypoint override.
-rules:
-  stage: rules
-  image:
-    name: prom/prometheus:latest
-    entrypoint: [""]
-  script:
-    - cd examples
-    - promtool check rules rules.yaml
-    - promtool test rules rules_test.yaml
