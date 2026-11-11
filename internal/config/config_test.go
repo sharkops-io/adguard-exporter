@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"gitlab.com/sharkops/exporters/adguard-exporter/internal/config"
+	"github.com/sharkops-io/adguard-exporter/internal/config"
 )
 
 func noEnv(string) string { return "" }

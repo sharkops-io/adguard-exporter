@@ -8,9 +8,9 @@ import (
 
 	"github.com/alecthomas/kingpin/v2"
 
-	common "gitlab.com/sharkops/exporters/exporter-common/config"
+	common "github.com/sharkops-io/exporter-common/config"
 
-	"gitlab.com/sharkops/exporters/adguard-exporter/internal/adguard"
+	"github.com/sharkops-io/adguard-exporter/internal/adguard"
 )
 
 // ErrHelpRequested is re-exported so main need not import the shared package

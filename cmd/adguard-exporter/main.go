@@ -13,10 +13,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"gitlab.com/sharkops/exporters/exporter-common/collector"
+	"github.com/sharkops-io/exporter-common/collector"
 
-	"gitlab.com/sharkops/exporters/adguard-exporter/internal/adguard"
-	"gitlab.com/sharkops/exporters/adguard-exporter/internal/config"
+	"github.com/sharkops-io/adguard-exporter/internal/adguard"
+	"github.com/sharkops-io/adguard-exporter/internal/config"
 )
 
 // version is overridden at build time via -ldflags "-X main.version=...".

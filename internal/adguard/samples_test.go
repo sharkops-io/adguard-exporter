@@ -3,7 +3,7 @@ package adguard
 import (
 	"testing"
 
-	"gitlab.com/sharkops/exporters/exporter-common/metric"
+	"github.com/sharkops-io/exporter-common/metric"
 )
 
 func byName(samples []metric.Sample, name string) []metric.Sample {

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.com/sharkops/exporters/exporter-common/httpx"
+	"github.com/sharkops-io/exporter-common/httpx"
 )
 
 // Config is one AdGuard Home instance's connection config.

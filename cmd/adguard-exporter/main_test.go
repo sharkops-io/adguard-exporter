@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitlab.com/sharkops/exporters/adguard-exporter/internal/config"
+	"github.com/sharkops-io/adguard-exporter/internal/config"
 )
 
 func fakeAdGuard(t *testing.T) *httptest.Server {

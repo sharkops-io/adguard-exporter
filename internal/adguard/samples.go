@@ -3,7 +3,7 @@ package adguard
 import (
 	"context"
 
-	"gitlab.com/sharkops/exporters/exporter-common/metric"
+	"github.com/sharkops-io/exporter-common/metric"
 )
 
 // Namespace is the metric prefix and also prefixes the collector's own
