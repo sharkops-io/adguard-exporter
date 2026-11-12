@@ -56,7 +56,7 @@ func mkBuckets(at21, at22, at23 float64) []float64 {
 }
 
 func TestScalarGauges(t *testing.T) {
-	s := Samples(testSnapshot(), "host1")
+	s := Samples(testSnapshot(), "dns1")
 
 	for name, want := range map[string]float64{
 		"adguard_running":                     1,
@@ -75,7 +75,7 @@ func TestScalarGauges(t *testing.T) {
 // Index 22, not 23: index 23 is the current partial hour and would read as a
 // collapse in traffic every time the hour rolls over.
 func TestLastHourUsesIndex22(t *testing.T) {
-	s := Samples(testSnapshot(), "host1")
+	s := Samples(testSnapshot(), "dns1")
 	if got := mustOne(t, s, "adguard_dns_queries_last_hour").Value; got != 200 {
 		t.Errorf("adguard_dns_queries_last_hour = %v, want 200 (index 22)", got)
 	}
@@ -90,7 +90,7 @@ func TestLastHourUsesIndex22(t *testing.T) {
 func TestLastHourOmittedWhenUnitsAreNotHours(t *testing.T) {
 	snap := testSnapshot()
 	snap.Stats.TimeUnits = "days"
-	s := Samples(snap, "host1")
+	s := Samples(snap, "dns1")
 	if got := byName(s, "adguard_dns_queries_last_hour"); len(got) != 0 {
 		t.Errorf("emitted %d _last_hour samples with time_units=days, want 0", len(got))
 	}
@@ -102,14 +102,14 @@ func TestLastHourOmittedWhenBucketsAreShort(t *testing.T) {
 	snap := testSnapshot()
 	snap.Stats.DNSQueries = []float64{1, 2}
 	snap.Stats.BlockedFiltering = []float64{1, 2}
-	s := Samples(snap, "host1")
+	s := Samples(snap, "dns1")
 	if got := byName(s, "adguard_dns_queries_last_hour"); len(got) != 0 {
 		t.Errorf("emitted _last_hour from a 2-element bucket array, want 0")
 	}
 }
 
 func TestBuildInfoCarriesVersion(t *testing.T) {
-	s := mustOne(t, Samples(testSnapshot(), "host1"), "adguard_build_info")
+	s := mustOne(t, Samples(testSnapshot(), "dns1"), "adguard_build_info")
 	if s.Labels["version"] != "v0.107.78" {
 		t.Errorf("version label = %q, want v0.107.78", s.Labels["version"])
 	}
@@ -119,7 +119,7 @@ func TestBuildInfoCarriesVersion(t *testing.T) {
 }
 
 func TestTopNLabels(t *testing.T) {
-	s := Samples(testSnapshot(), "host1")
+	s := Samples(testSnapshot(), "dns1")
 
 	c := mustOne(t, s, "adguard_top_clients")
 	if c.Labels["client"] != "192.0.2.10" || c.Value != 23282 {
@@ -140,9 +140,9 @@ func TestTopNLabels(t *testing.T) {
 // AdGuard instances' otherwise name-and-label-identical device series
 // collide at Gather and one instance's whole payload is silently dropped.
 func TestServerLabelOnEverySample(t *testing.T) {
-	for _, s := range Samples(testSnapshot(), "host1") {
-		if got := s.Labels["server"]; got != "host1" {
-			t.Errorf("sample %s: server label = %q, want %q", s.Name, got, "host1")
+	for _, s := range Samples(testSnapshot(), "dns1") {
+		if got := s.Labels["server"]; got != "dns1" {
+			t.Errorf("sample %s: server label = %q, want %q", s.Name, got, "dns1")
 		}
 	}
 }
@@ -178,7 +178,7 @@ func TestEmittedMetricNameSetIsExact(t *testing.T) {
 	}
 
 	got := map[string]bool{}
-	for _, s := range Samples(testSnapshot(), "host1") {
+	for _, s := range Samples(testSnapshot(), "dns1") {
 		got[s.Name] = true
 	}
 
@@ -199,7 +199,7 @@ func TestEmittedMetricNameSetIsExact(t *testing.T) {
 // out, not lifetime counters. An accidentally-Counter'd sample would produce
 // silent nonsense under rate()/increase() that no other test here catches.
 func TestAllSamplesAreGauges(t *testing.T) {
-	for _, s := range Samples(testSnapshot(), "host1") {
+	for _, s := range Samples(testSnapshot(), "dns1") {
 		if s.Kind != metric.KindGauge {
 			t.Errorf("sample %s has Kind %v, want KindGauge", s.Name, s.Kind)
 		}
@@ -210,7 +210,7 @@ func TestFalseBooleansArePublishedAsZero(t *testing.T) {
 	snap := testSnapshot()
 	snap.Status.Running = false
 	snap.Status.ProtectionEnabled = false
-	s := Samples(snap, "host1")
+	s := Samples(snap, "dns1")
 	if got := mustOne(t, s, "adguard_running").Value; got != 0 {
 		t.Errorf("adguard_running = %v, want 0", got)
 	}

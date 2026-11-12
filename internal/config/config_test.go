@@ -16,7 +16,7 @@ func envFrom(m map[string]string) func(string) string {
 func TestParsesServersFromEnv(t *testing.T) {
 	cfg, err := config.Parse(nil, envFrom(map[string]string{
 		"ADGUARD_SERVERS":   "http://a:3000,http://b",
-		"ADGUARD_NAMES":     "host1,pi",
+		"ADGUARD_NAMES":     "dns1,dns2",
 		"ADGUARD_USERNAMES": "ua,ub",
 		"ADGUARD_PASSWORDS": "pa,pb",
 	}))
@@ -26,7 +26,7 @@ func TestParsesServersFromEnv(t *testing.T) {
 	if len(cfg.Servers) != 2 {
 		t.Fatalf("len(Servers) = %d, want 2", len(cfg.Servers))
 	}
-	if cfg.Servers[0].Name != "host1" || cfg.Servers[0].URL != "http://a:3000" {
+	if cfg.Servers[0].Name != "dns1" || cfg.Servers[0].URL != "http://a:3000" {
 		t.Errorf("Servers[0] = %+v", cfg.Servers[0])
 	}
 	if cfg.Servers[1].Username != "ub" || cfg.Servers[1].Password != "pb" {

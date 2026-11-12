@@ -43,7 +43,7 @@ func TestTwoServersGatherWithoutCollision(t *testing.T) {
 		case "ADGUARD_SERVERS":
 			return a.URL + "," + b.URL
 		case "ADGUARD_NAMES":
-			return "host1,pi"
+			return "dns1,dns2"
 		case "ADGUARD_USERNAMES":
 			return "u,u"
 		case "ADGUARD_PASSWORDS":
@@ -70,8 +70,8 @@ func TestTwoServersGatherWithoutCollision(t *testing.T) {
 
 	// Both servers must be present and distinguishable.
 	for _, want := range []string{
-		`adguard_scrape_collector_success{server="host1"} 1`,
-		`adguard_scrape_collector_success{server="pi"} 1`,
+		`adguard_scrape_collector_success{server="dns1"} 1`,
+		`adguard_scrape_collector_success{server="dns2"} 1`,
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("missing %q", want)
@@ -117,7 +117,7 @@ func TestTwoServersDeviceMetricsDoNotCollide(t *testing.T) {
 		case "ADGUARD_SERVERS":
 			return a.URL + "," + b.URL
 		case "ADGUARD_NAMES":
-			return "host1,pi"
+			return "dns1,dns2"
 		case "ADGUARD_USERNAMES":
 			return "u,u"
 		case "ADGUARD_PASSWORDS":
@@ -152,7 +152,7 @@ func TestTwoServersDeviceMetricsDoNotCollide(t *testing.T) {
 			}
 		}
 	}
-	for _, want := range []string{"host1", "pi"} {
+	for _, want := range []string{"dns1", "dns2"} {
 		if !servers[want] {
 			t.Errorf("adguard_dns_queries_24h missing server=%q; got servers %v", want, servers)
 		}
