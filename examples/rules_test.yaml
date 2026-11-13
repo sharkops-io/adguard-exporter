@@ -8,7 +8,7 @@ tests:
   # --- AdGuardDown ---------------------------------------------------------
   - interval: 1m
     input_series:
-      - series: 'adguard_running{server="pi"}'
+      - series: 'adguard_running{server="dns2"}'
         values: '0+0x20'
     alert_rule_test:
       - eval_time: 10m
@@ -16,15 +16,15 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              server: pi
+              server: dns2
             exp_annotations:
-              summary: "AdGuard pi reports itself stopped"
-              description: "DNS resolution for clients using pi is failing."
+              summary: "AdGuard dns2 reports itself stopped"
+              description: "DNS resolution for clients using dns2 is failing."
 
   # A running instance must NOT page.
   - interval: 1m
     input_series:
-      - series: 'adguard_running{server="pi"}'
+      - series: 'adguard_running{server="dns2"}'
         values: '1+0x20'
     alert_rule_test:
       - eval_time: 10m
@@ -34,7 +34,7 @@ tests:
   # --- AdGuardProtectionDisabled --------------------------------------------
   - interval: 1m
     input_series:
-      - series: 'adguard_protection_enabled{server="host1"}'
+      - series: 'adguard_protection_enabled{server="dns1"}'
         values: '0+0x60'
     alert_rule_test:
       - eval_time: 40m
@@ -42,15 +42,15 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              server: host1
+              server: dns1
             exp_annotations:
-              summary: "AdGuard host1 has filtering disabled"
-              description: "Ad and tracker blocking is off on host1. This is usually a temporary pause left on by accident."
+              summary: "AdGuard dns1 has filtering disabled"
+              description: "Ad and tracker blocking is off on dns1. This is usually a temporary pause left on by accident."
 
   # Protection enabled must NOT page.
   - interval: 1m
     input_series:
-      - series: 'adguard_protection_enabled{server="host1"}'
+      - series: 'adguard_protection_enabled{server="dns1"}'
         values: '1+0x60'
     alert_rule_test:
       - eval_time: 40m
@@ -60,7 +60,7 @@ tests:
   # --- AdGuardCollectorFailing -----------------------------------------------
   - interval: 1m
     input_series:
-      - series: 'adguard_scrape_collector_success{server="pi"}'
+      - series: 'adguard_scrape_collector_success{server="dns2"}'
         values: '0+0x20'
     alert_rule_test:
       - eval_time: 20m
@@ -68,15 +68,15 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              server: pi
+              server: dns2
             exp_annotations:
-              summary: "AdGuard pi is not collecting"
-              description: "The exporter is up but cannot read pi. Check credentials and reachability."
+              summary: "AdGuard dns2 is not collecting"
+              description: "The exporter is up but cannot read dns2. Check credentials and reachability."
 
   # A healthy collector must NOT page.
   - interval: 1m
     input_series:
-      - series: 'adguard_scrape_collector_success{server="pi"}'
+      - series: 'adguard_scrape_collector_success{server="dns2"}'
         values: '1+0x20'
     alert_rule_test:
       - eval_time: 20m
@@ -114,7 +114,7 @@ tests:
   # A healthy window must NOT fire, which is what catches an inverted comparison.
   - interval: 1m
     input_series:
-      - series: 'adguard_stats_window_seconds{server="pi"}'
+      - series: 'adguard_stats_window_seconds{server="dns2"}'
         values: '86400+0x120'
     alert_rule_test:
       - eval_time: 90m
@@ -123,7 +123,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'adguard_stats_window_seconds{server="pi"}'
+      - series: 'adguard_stats_window_seconds{server="dns2"}'
         values: '604800+0x120'
     alert_rule_test:
       - eval_time: 90m
@@ -131,15 +131,15 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              server: pi
+              server: dns2
             exp_annotations:
-              summary: "AdGuard pi statistics window is not 24h"
+              summary: "AdGuard dns2 statistics window is not 24h"
               description: "Window is 604800s. The _24h and _last_hour metric names no longer describe what they carry."
 
   # --- AdGuardSlowProcessing --------------------------------------------------
   - interval: 1m
     input_series:
-      - series: 'adguard_avg_processing_time_seconds{server="pi"}'
+      - series: 'adguard_avg_processing_time_seconds{server="dns2"}'
         values: '0.15+0x20'
     alert_rule_test:
       - eval_time: 20m
@@ -147,15 +147,15 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              server: pi
+              server: dns2
             exp_annotations:
-              summary: "AdGuard pi is resolving slowly"
+              summary: "AdGuard dns2 is resolving slowly"
               description: "Mean processing time is 150ms, against a ~17ms baseline."
 
   # Baseline latency must not page.
   - interval: 1m
     input_series:
-      - series: 'adguard_avg_processing_time_seconds{server="pi"}'
+      - series: 'adguard_avg_processing_time_seconds{server="dns2"}'
         values: '0.018+0x30'
     alert_rule_test:
       - eval_time: 20m
